@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
+import Client from "./Client";
 var $ = require('jquery');
 var createReactClass = require('create-react-class');
 
@@ -42,15 +43,16 @@ function showLogin() {
 }
 
 function getParent(path, onSuccess) {
-        $.ajax({
-                url: buildGetParentUrl(path),
-        dataType: 'json',
-        cache: false,
-        success: onSuccess,
-        error: function(xhr, status, err) {
-                console.error(this.props.url, status, err.toString());
-        }.bind(this)
-        });
+        // $.ajax({
+        //         url: buildGetParentUrl(path),
+        // dataType: 'json',
+        // cache: false,
+        // success: onSuccess,
+        // error: function(xhr, status, err) {
+        //         console.error(this.props.url, status, err.toString());
+        // }.bind(this)
+        // });
+    Client.getRaw(buildGetParentUrl(path), onSuccess);
 }
 function updateNavbarPath(path) {
         var elem  = document.getElementById("pathSpan");
@@ -95,31 +97,39 @@ var File = createReactClass({
 
 
     remove: function() {
-            $.ajax({
-                    url: buildRemoveUrl(this.props.path),
-            dataType: 'json',
-            cache: false,
-            success: function() {
-                    this.props.browser.reloadFilesFromServer();
-            }.bind(this),
-            error: function(xhr, status, err) {
-                    console.error(this.props.url, status, err.toString());
-            }.bind(this)
-            });
+            // $.ajax({
+            //         url: buildRemoveUrl(this.props.path),
+            // dataType: 'json',
+            // cache: false,
+            // success: function() {
+            //         this.props.browser.reloadFilesFromServer();
+            // }.bind(this),
+            // error: function(xhr, status, err) {
+            //         console.error(this.props.url, status, err.toString());
+            // }.bind(this)
+            // });
+            Client.getRaw(
+              buildRemoveUrl(this.props.path),
+              ()=>{this.props.browser.reloadFilesFromServer();}
+            );
     },
 
     rename: function(updatedName) {
-            $.ajax({
-                    url: buildRenameUrl(this.props.path,  updatedName),
-            dataType: 'json',
-            cache: false,
-            success: function() {
-                    this.props.browser.reloadFilesFromServer();
-            }.bind(this),
-            error: function(xhr, status, err) {
-                    console.error(this.props.url, status, err.toString());
-            }.bind(this)
-            });
+            // $.ajax({
+            //         url: buildRenameUrl(this.props.path,  updatedName),
+            // dataType: 'json',
+            // cache: false,
+            // success: function() {
+            //         this.props.browser.reloadFilesFromServer();
+            // }.bind(this),
+            // error: function(xhr, status, err) {
+            //         console.error(this.props.url, status, err.toString());
+            // }.bind(this)
+            // });
+            Client.getRaw(
+              buildRenameUrl(this.props.path,  updatedName),
+              ()=>{this.props.browser.reloadFilesFromServer();}
+            );
     },
 
     onRemove: function() {
@@ -185,11 +195,9 @@ var Browser = createReactClass({
         },
 
     loadFilesFromServer: function(path) {
-            $.ajax({
-                    url: buildGetChildrenUrl(path),
-            dataType: 'json',
-            cache: false,
-            success: function(data) {
+           Client.getRaw(
+              buildGetChildrenUrl(path),
+              (data)=>{
                     var files = data.children.sort(this.state.sort);
                     var paths = this.state.paths; 
                     if (paths[paths.length-1] !== path)
@@ -199,13 +207,32 @@ var Browser = createReactClass({
                                     paths: paths,
                             sort: this.state.sort,
                             gridView: this.state.gridView});
-            updateNavbarPath(this.currentPath());
-            hideLogin();
-            }.bind(this),
-            error: function(xhr, status, err) {
-                    console.error(this.props.url, status, err.toString());
-            }.bind(this)
-            });
+                    updateNavbarPath(this.currentPath());
+                    hideLogin();
+              }
+            );
+            // $.ajax({
+            //         url: buildGetChildrenUrl(path),
+            // dataType: 'json',
+            // cache: false,
+            // success: function(data) {
+            //         var files = data.children.sort(this.state.sort);
+            //         var paths = this.state.paths; 
+            //         if (paths[paths.length-1] !== path)
+            //         paths = paths.concat([path]) 
+            //         this.setState(
+            //                 {files: files, 
+            //                         paths: paths,
+            //                 sort: this.state.sort,
+            //                 gridView: this.state.gridView});
+            // updateNavbarPath(this.currentPath());
+            // hideLogin();
+            // }.bind(this),
+            // error: function(xhr, status, err) {
+            //         console.error(this.props.url, status, err.toString());
+            // }.bind(this)
+            // });
+
     },
 
     reloadFilesFromServer: function() {this.loadFilesFromServer(this.currentPath())},
@@ -354,15 +381,19 @@ var Browser = createReactClass({
             if (newFolderName == null)
                     return;
 
-            $.ajax({
-                    url: buildMkdirUrl(this.currentPath(),newFolderName),
-                    dataType: 'json',
-                    cache: false,
-                    success: this.reloadFilesFromServer,
-                    error: function(xhr, status, err) {
-                            console.error(this.props.url, status, err.toString());
-                    }.bind(this)
-            });
+            // $.ajax({
+            //         url: buildMkdirUrl(this.currentPath(),newFolderName),
+            //         dataType: 'json',
+            //         cache: false,
+            //         success: this.reloadFilesFromServer,
+            //         error: function(xhr, status, err) {
+            //                 console.error(this.props.url, status, err.toString());
+            //         }.bind(this)
+            // });
+            Client.getRaw(
+              buildMkdirUrl(this.currentPath(),newFolderName),
+              this.reloadFilesFromServer
+            );
     },
 
     render: function() {
@@ -413,7 +444,8 @@ var Browser = createReactClass({
                             </tbody>
                             </table>
                             {contextMenu}
-                            </div>)
+                            
+              </div>)
     }
 });
 
