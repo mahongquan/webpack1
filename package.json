@@ -1,0 +1,26 @@
+{
+  "name": "webpack1",
+  "version": "1.0.0",
+  "description": "\"webpack1\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mahongquan/webpack1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mahongquan/webpack1/issues"
+  },
+  "homepage": "https://github.com/mahongquan/webpack1#readme",
+  "devDependencies": {
+    "webpack": "^3.3.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4"
+  }
+}
