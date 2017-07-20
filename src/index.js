@@ -35,11 +35,11 @@ function buildMkdirUrl(path, name) {
 }
 
 function hideLogin() {
-        document.getElementById("login-form").style.display= "none";
+        //document.getElementById("login-form").style.display= "none";
 }
 
 function showLogin() {
-        $('#login-form').style.display= "block";
+        //$('#login-form').style.display= "block";
 }
 
 function getParent(path, onSuccess) {
@@ -55,8 +55,8 @@ function getParent(path, onSuccess) {
     Client.getRaw(buildGetParentUrl(path), onSuccess);
 }
 function updateNavbarPath(path) {
-        var elem  = document.getElementById("pathSpan");
-        elem.innerHTML = '<span class="glyphicon glyphicon-chevron-right"/>' +path;
+        // var elem  = document.getElementById("pathSpan");
+        // elem.innerHTML = '<span class="glyphicon glyphicon-chevron-right"/>' +path;
 }
 var File = createReactClass({
 
@@ -188,10 +188,12 @@ File.sizeString =  function(sizeBytes){
 }
 var Browser = createReactClass({
         getInitialState: function() {
-                return {paths : ["."],
-                        files: [],
-    sort: File.pathSort,
-    gridView: true};
+            return {
+              paths : ["."],
+              files: [],
+              sort: File.pathSort,
+              gridView: false
+          };
         },
 
     loadFilesFromServer: function(path) {
@@ -265,10 +267,10 @@ var Browser = createReactClass({
     alternateView: function() {
             var updatedView = !  this.state.gridView;
 
-            this.setState({files: this.state.files, 
-                    sort: this.state.sort,  
-                    paths: this.state.paths, 
-                    gridView: updatedView});
+            this.setState(
+              {     
+                    gridView: updatedView
+              });
     },
 
 
@@ -329,22 +331,22 @@ var Browser = createReactClass({
     componentDidMount: function() {
             var path = this.currentPath();
             this.loadFilesFromServer(path);
-            var backButton = document.getElementById("backButton");
-            backButton.onclick = this.onBack;
-            var uploadButton = document.getElementById("uploadButton");
-            uploadButton.onclick = this.onUpload;
-            var parentButton = document.getElementById("parentButton");
-            parentButton.onclick = this.onParent;
-            var uploadInput = document.getElementById("uploadInput"); 
-            uploadInput.addEventListener("change", this.uploadFile(), false);
-            var mkdirButton = document.getElementById("mkdirButton"); 
-            mkdirButton.onclick = this.mkdir;
-            var alternateViewButton = document.getElementById("alternateViewButton"); 
-            alternateViewButton.onclick = this.alternateView; 
-            var loginButton = document.getElementById("loginButton");
-            loginButton.onclick = this.login; 
-            var passwordInput= document.getElementById("login-password-input");
-            passwordInput.onkeypress=this.loginOnEnter;
+            // var backButton = document.getElementById("backButton");
+            // backButton.onclick = this.onBack;
+            // var uploadButton = document.getElementById("uploadButton");
+            // uploadButton.onclick = this.onUpload;
+            // var parentButton = document.getElementById("parentButton");
+            // parentButton.onclick = this.onParent;
+            // var uploadInput = document.getElementById("uploadInput"); 
+            // uploadInput.addEventListener("change", this.uploadFile(), false);
+            // var mkdirButton = document.getElementById("mkdirButton"); 
+            // mkdirButton.onclick = this.mkdir;
+            // var alternateViewButton = document.getElementById("alternateViewButton"); 
+            // alternateViewButton.onclick = this.alternateView; 
+            // var loginButton = document.getElementById("loginButton");
+            // loginButton.onclick = this.login; 
+            // var passwordInput= document.getElementById("login-password-input");
+            // passwordInput.onkeypress=this.loginOnEnter;
     },
 
     updateSort: function(sort) {
@@ -410,10 +412,7 @@ var Browser = createReactClass({
 
             var gridGlyph = "glyphicon glyphicon-th-large";
             var listGlyph = "glyphicon glyphicon-list";
-            var element = document.getElementById("altViewSpan");
             var className = this.state.gridView ? listGlyph : gridGlyph;
-            element.className = className;
-
             var layout = null;
             var  contextMenu = (<div id="context-menu">
                             <ul className="dropdown-menu" role="menu">
@@ -424,28 +423,69 @@ var Browser = createReactClass({
                             </div>);
 
             layout = null; 
-            if (this.state.gridView) 
-                    return (<div>
+            var toolbar=(<div><nav className="navbar navbar-inverse navbar-fixed-top" role="navigation">
+                        <div className="navbar-header">
+                                <button type="button" className="navbar-toggle" data-toggle="collapse" data-target="#example-navbar-collapse">
+                                        <span className="sr-only">Toggle navigation</span>
+                                        <span className="icon-bar"></span>
+                                        <span className="icon-bar"></span>
+                                        <span className="icon-bar"></span>
+                                </button>
+                        </div>
+                        <div className="collapse navbar-collapse" id="example-navbar-collapse">
+                                <ul className="nav navbar-nav">
+                                        <li id="backButton"><a onClick={this.onBack}><span className="glyphicon glyphicon-arrow-left"/></a></li>
+                                        <li id="parentButton"><a onClick={this.onParent} ><span className="glyphicon glyphicon-arrow-up"/></a></li>
+                                        <li id="forwardButton"><a ><span className="glyphicon glyphicon-arrow-right"/></a></li>
+                                        <li id="uploadButton"><a onClick={this.onUpload} ><span className="glyphicon glyphicon-upload"/></a></li>
+                                        <li id="mkdirButton"><a onClick={this.mkdir} ><span className="glyphicon glyphicon-folder-open"/></a></li>
+                                        <li id="alternateViewButton"><a onClick={this.alternateView}>
+                                       <span ref="altViewSpan" className={className} />
+                                        </a></li>
+                                        <li><a id="pathSpan"><span className="glyphicon glyphicon-chevron-right"/></a></li>
+                                </ul>
+
+                                <div id="login-form" className="navbar-form navbar-right">
+                                        <div  className="form-group">
+                                                <input placeholder="Email" id="login-user-input" className="form-control" type="text" />
+                                        </div>
+                                                <div className="form-group">
+                                                        <input placeholder="Password" id="login-password-input" className="form-control" type="password" />
+                                                </div>
+                                                <button id="loginButton" className="btn btn-success" >Sign in</button>
+                                </div>
+                        </div>
+                </nav>
+
+    <h1>&nbsp;</h1>
+    <input type="file" id="uploadInput" style={{display:"none"}} /></div>);
+            if (this.state.gridView)
+            { 
+                    return (<div>{toolbar}
                                     {files}
                                     {contextMenu}
                                     </div>)
 
-                            var sortGlyph = "glyphicon glyphicon-sort";
-
-            return (<div>
-                            <table className="table table-responsive table-striped table-hover">
-                            <thead><tr>
-                            <th><button onClick={this.pathSort} className="btn btn-default"><span className={sortGlyph}/>Path</button></th>
-                            <th><button onClick={this.sizeSort} className="btn btn-default"><span className={sortGlyph}/>Size</button></th>
-                            <th><button onClick={this.timeSort} className="btn btn-default"><span className={sortGlyph}/>Last modified time</button></th>
-                            </tr></thead>
-                            <tbody>
-                            {files}
-                            </tbody>
-                            </table>
-                            {contextMenu}
                             
-              </div>)
+            }
+            else{
+              var sortGlyph = "glyphicon glyphicon-sort";
+              return (<div>
+                              {toolbar}
+                              <table className="table table-responsive table-striped table-hover">
+                              <thead><tr>
+                              <th><button onClick={this.pathSort} className="btn btn-default"><span className={sortGlyph}/>Path</button></th>
+                              <th><button onClick={this.sizeSort} className="btn btn-default"><span className={sortGlyph}/>Size</button></th>
+                              <th><button onClick={this.timeSort} className="btn btn-default"><span className={sortGlyph}/>Last modified time</button></th>
+                              </tr></thead>
+                              <tbody>
+                              {files}
+                              </tbody>
+                              </table>
+                              {contextMenu}
+                              
+                </div>)
+            }
     }
 });
 
