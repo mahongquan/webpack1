@@ -2,9 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
+import './react-contextmenu.css'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
 import Client from "./Client";
-var $ = require('jquery');
 var createReactClass = require('create-react-class');
 
 function buildGetChildrenUrl(path) {
@@ -23,7 +23,7 @@ function buildRemoveUrl(path) {
         return  "/fs/remove?path="+path;
 }
 function buildGetContentUrl(path) {
-        return "/fs/content?path="+path;
+        return "/static/"+path;
 }
 
 function buildUploadUrl(path, name) {
@@ -34,80 +34,22 @@ function buildMkdirUrl(path, name) {
         return "/fs/mkdir?path="+path+"&name="+name;
 }
 
-function hideLogin() {
-        //document.getElementById("login-form").style.display= "none";
-}
-
-function showLogin() {
-        //$('#login-form').style.display= "block";
-}
 
 function getParent(path, onSuccess) {
-        // $.ajax({
-        //         url: buildGetParentUrl(path),
-        // dataType: 'json',
-        // cache: false,
-        // success: onSuccess,
-        // error: function(xhr, status, err) {
-        //         console.error(this.props.url, status, err.toString());
-        // }.bind(this)
-        // });
     Client.getRaw(buildGetParentUrl(path), onSuccess);
 }
-function updateNavbarPath(path) {
-        // var elem  = document.getElementById("pathSpan");
-        // elem.innerHTML = '<span class="glyphicon glyphicon-chevron-right"/>' +path;
-}
+
 var File = createReactClass({
 
         glyphClass: function() {
-                var className = "glyphicon "; 
+                var className = "glyphicon ";
                 className += this.props.isdir ? "glyphicon-folder-open" : "glyphicon-file";
                 return className;
         },
 
-    renderGrid: function() {
-            var glyphClass = this.glyphClass();
-            return (<div ref={this.props.path} className="col-xs-6 col-md-3">
-                    <a id={this.props.id} onClick={this.props.onClick}>
-                    <span style={{fontSize:"3.5em"}} className={glyphClass}/>
-                    </a>
-                    <div className="caption">
-                    <h4 className="heading">{this.props.name}</h4>
-                    </div>
-                    </div>);
-    },
-
-    componentDidMount: function() {
-            var selector = "#"+this.props.id;
-            $(selector).contextmenu({
-                    target: '#context-menu',
-                    onItem: function(context, evt) {
-                            var selected  =  evt.target.text.trim();
-                            console.log("on item "+ selected);
-                            if  (selected  === "Rename") {
-                                    this.onRename();
-                            } else if (selected  === "Remove")  {
-                                    this.onRemove();
-                            }  else 
-                    console.log("no  action defined for context menu item "+ selected);    
-                    }.bind(this)
-            });
-    },
 
 
     remove: function() {
-            // $.ajax({
-            //         url: buildRemoveUrl(this.props.path),
-            // dataType: 'json',
-            // cache: false,
-            // success: function() {
-            //         this.props.browser.reloadFilesFromServer();
-            // }.bind(this),
-            // error: function(xhr, status, err) {
-            //         console.error(this.props.url, status, err.toString());
-            // }.bind(this)
-            // });
             Client.getRaw(
               buildRemoveUrl(this.props.path),
               ()=>{this.props.browser.reloadFilesFromServer();}
@@ -115,48 +57,62 @@ var File = createReactClass({
     },
 
     rename: function(updatedName) {
-            // $.ajax({
-            //         url: buildRenameUrl(this.props.path,  updatedName),
-            // dataType: 'json',
-            // cache: false,
-            // success: function() {
-            //         this.props.browser.reloadFilesFromServer();
-            // }.bind(this),
-            // error: function(xhr, status, err) {
-            //         console.error(this.props.url, status, err.toString());
-            // }.bind(this)
-            // });
             Client.getRaw(
               buildRenameUrl(this.props.path,  updatedName),
               ()=>{this.props.browser.reloadFilesFromServer();}
             );
     },
 
-    onRemove: function() {
+    onRemove: function(e,data) {
+            console.log("onRemove");
             var type = this.props.isdir ? "folder" : "file";
-            var remove =true;// confirm("Remove "+type +" '"+ this.props.path +"' ?");
-            if (remove)     
+            var remove =window.confirm("Remove "+type +" '"+ this.props.path +"' ?");
+            if (remove)
                     this.remove();
     },
 
-    onRename: function() {
+    onRename: function(e,data) {
+            console.log("onRename");
             var type = this.props.isdir ? "folder" : "file";
             var updatedName = prompt("Enter new name for "+type +" "+this.props.name);
-            if (updatedName != null) 
+            if (updatedName != null)
                     this.rename(updatedName);
     },
 
     renderList: function() {
             var dateString =  new Date(this.props.time*1000).toGMTString()
-                    var glyphClass = this.glyphClass();
-            var spanStyle = {fontSize:"1.5em"}; 
+            var glyphClass = this.glyphClass();
             return (<tr id={this.props.id} ref={this.props.path}>
                             <td>
+                            <ContextMenuTrigger id={""+this.props.id}>
                             <a onClick={this.props.onClick}><span style={{fontSize:"1.5em", paddingRight:"10px"}} className={glyphClass}/>{this.props.name}</a>
+                            </ContextMenuTrigger>
+                            <ContextMenu id={""+this.props.id}>
+                                <MenuItem data={{a:1}} onClick={this.onRemove}>remove</MenuItem>
+                                <MenuItem data={{a:2}} onClick={this.onRename}>rename</MenuItem>
+                              </ContextMenu>
                             </td>
                             <td>{File.sizeString(this.props.size)}</td>
                             <td>{dateString}</td>
                             </tr>);
+    },
+    renderGrid: function() {
+            var glyphClass = this.glyphClass();
+            return (<div ref={this.props.path} className="col-xs-6 col-md-3">
+                <ContextMenuTrigger id={""+this.props.id}>
+                    <a id={this.props.id} onClick={this.props.onClick}>
+                    <span style={{fontSize:"3.5em"}} className={glyphClass}/>
+
+                    </a>
+                </ContextMenuTrigger>
+                            <ContextMenu id={""+this.props.id}>
+                                <MenuItem data={{a:1}} onClick={this.onRemove}>remove</MenuItem>
+                                <MenuItem data={{a:2}} onClick={this.onRename}>rename</MenuItem>
+                              </ContextMenu>
+                    <div className="caption">
+                    <h4 className="heading">{this.props.name}</h4>
+                    </div>
+                    </div>);
     },
 
     render: function() {
@@ -164,15 +120,13 @@ var File = createReactClass({
     }
 });
 
-//File.id = function(name) {return name.match(/([a-z]|[0-9])/g).join("");}
-
 File.id = function() {return (Math.pow(2,31) * Math.random())|0; }
 
-File.timeSort = function(left, right){return left.time - right.time;} 
+File.timeSort = function(left, right){return left.time - right.time;}
 
-File.sizeSort = function(left, right){return left.size - right.size;} 
+File.sizeSort = function(left, right){return left.size - right.size;}
 
-File.pathSort = function(left, right){return left.path.localeCompare(right.path);} 
+File.pathSort = function(left, right){return left.path.localeCompare(right.path);}
 
 File.sizes = [{count : 1, unit:"bytes"}, {count : 1024, unit: "kB"}, {count: 1048576 , unit : "MB"}, {count: 1073741824, unit:"GB" } ]
 
@@ -184,7 +138,7 @@ File.sizeString =  function(sizeBytes){
                 if (count < 1024)
                         break;
         }
-        return "" + (count|0) +" "+ File.sizes[iUnit].unit;   
+        return "" + (count|0) +" "+ File.sizes[iUnit].unit;
 }
 var Browser = createReactClass({
         getInitialState: function() {
@@ -192,52 +146,39 @@ var Browser = createReactClass({
               paths : ["."],
               files: [],
               sort: File.pathSort,
-              gridView: false
+              gridView: false,
+              current_path:"",
+              displayUpload:"none",
           };
         },
 
     loadFilesFromServer: function(path) {
+        var self=this;
            Client.getRaw(
               buildGetChildrenUrl(path),
               (data)=>{
-                    var files = data.children.sort(this.state.sort);
-                    var paths = this.state.paths; 
+                    var files = data.children.sort(self.state.sort);
+                    var paths = self.state.paths;
                     if (paths[paths.length-1] !== path)
-                    paths = paths.concat([path]) 
-                    this.setState(
-                            {files: files, 
+                    paths = paths.concat([path])
+                    self.setState(
+                            {files: files,
                                     paths: paths,
-                            sort: this.state.sort,
-                            gridView: this.state.gridView});
-                    updateNavbarPath(this.currentPath());
-                    hideLogin();
+                            sort: self.state.sort,
+                            gridView: self.state.gridView});
+                    self.updateNavbarPath(self.currentPath());
               }
             );
-            // $.ajax({
-            //         url: buildGetChildrenUrl(path),
-            // dataType: 'json',
-            // cache: false,
-            // success: function(data) {
-            //         var files = data.children.sort(this.state.sort);
-            //         var paths = this.state.paths; 
-            //         if (paths[paths.length-1] !== path)
-            //         paths = paths.concat([path]) 
-            //         this.setState(
-            //                 {files: files, 
-            //                         paths: paths,
-            //                 sort: this.state.sort,
-            //                 gridView: this.state.gridView});
-            // updateNavbarPath(this.currentPath());
-            // hideLogin();
-            // }.bind(this),
-            // error: function(xhr, status, err) {
-            //         console.error(this.props.url, status, err.toString());
-            // }.bind(this)
-            // });
+    },
+    updateNavbarPath:function(path){
+         // var elem  = document.getElementById("pathSpan");
+        // elem.innerHTML = '<span class="glyphicon glyphicon-chevron-right"/>' +path;
+        this.setState({current_path:path});
 
     },
-
-    reloadFilesFromServer: function() {this.loadFilesFromServer(this.currentPath())},
+    reloadFilesFromServer: function() {
+        this.loadFilesFromServer(this.currentPath())
+    },
 
     currentPath : function() {
             return this.state.paths[this.state.paths.length-1]
@@ -248,12 +189,12 @@ var Browser = createReactClass({
                     alert("Cannot go back from "+ this.currentPath());
                     return;
             }
-            this.state.paths = this.state.paths.slice(0,-1);
+            this.setState({paths:this.state.paths.slice(0,-1)});
             this.loadFilesFromServer(this.currentPath());
     },
 
     onUpload: function() {
-            $('#uploadInput').click();
+            this.setState({displayUpload:""});
     },
 
     onParent: function() {
@@ -268,7 +209,7 @@ var Browser = createReactClass({
             var updatedView = !  this.state.gridView;
 
             this.setState(
-              {     
+              {
                     gridView: updatedView
               });
     },
@@ -291,8 +232,8 @@ var Browser = createReactClass({
                             if (xhr.readyState !== 4)
                                     return;
 
-                            if (xhr.status === 200){ 
-                                    alert("Successfully uploaded file "+ name +" to "+ path); 
+                            if (xhr.status === 200){
+                                    alert("Successfully uploaded file "+ name +" to "+ path);
                                     this.reloadFilesFromServer();
                             }
                             else
@@ -302,59 +243,18 @@ var Browser = createReactClass({
             }.bind(this)
     },
 
-    loginOnEnter: function(event) {
-            if (event.keyCode === 13) {
-                    this.login();
-                    return false;
-            }
-    },
-
-    login: function() {
-            var user = document.getElementById("login-user-input").value;
-            var password = document.getElementById("login-password-input").value;
-            var json = JSON.stringify({"username": user, "password": password});
-            console.log("post data "+ json);
-            $.ajax({
-                    url: "/login",
-                    type: "POST",
-                    dataType: 'json',
-                    data: json,
-                    cache: false,
-                    success: this.reloadFilesFromServer,
-                    error: function(xhr, status, err) {
-                            console.error(this.props.url, status, err.toString());
-                            alert("Failed authentication.");
-                    }.bind(this)
-            });
-    },
 
     componentDidMount: function() {
             var path = this.currentPath();
             this.loadFilesFromServer(path);
-            // var backButton = document.getElementById("backButton");
-            // backButton.onclick = this.onBack;
-            // var uploadButton = document.getElementById("uploadButton");
-            // uploadButton.onclick = this.onUpload;
-            // var parentButton = document.getElementById("parentButton");
-            // parentButton.onclick = this.onParent;
-            // var uploadInput = document.getElementById("uploadInput"); 
-            // uploadInput.addEventListener("change", this.uploadFile(), false);
-            // var mkdirButton = document.getElementById("mkdirButton"); 
-            // mkdirButton.onclick = this.mkdir;
-            // var alternateViewButton = document.getElementById("alternateViewButton"); 
-            // alternateViewButton.onclick = this.alternateView; 
-            // var loginButton = document.getElementById("loginButton");
-            // loginButton.onclick = this.login; 
-            // var passwordInput= document.getElementById("login-password-input");
-            // passwordInput.onkeypress=this.loginOnEnter;
     },
 
     updateSort: function(sort) {
             var files  = this.state.files
                     var lastSort = this.state.sort;
-            if  (lastSort === sort)  
+            if  (lastSort === sort)
                     files = files.reverse();
-            else 
+            else
                     files = files.sort(sort);
 
             this.setState({files: files, sort: sort,  paths: this.state.paths, gridView: this.state.gridView});
@@ -373,8 +273,10 @@ var Browser = createReactClass({
             this.loadFilesFromServer(path);
     },
     getContent: function(path) {
-            var url = buildGetContentUrl(path);
-            //ma location.href=url;
+        console.log("getContent");
+        var url = buildGetContentUrl(path);
+        console.log(url);
+        //window.location.href=url;
     },
 
     mkdir: function() {
@@ -382,38 +284,44 @@ var Browser = createReactClass({
             var newFolderName = prompt("Enter new folder name");
             if (newFolderName == null)
                     return;
-
-            // $.ajax({
-            //         url: buildMkdirUrl(this.currentPath(),newFolderName),
-            //         dataType: 'json',
-            //         cache: false,
-            //         success: this.reloadFilesFromServer,
-            //         error: function(xhr, status, err) {
-            //                 console.error(this.props.url, status, err.toString());
-            //         }.bind(this)
-            // });
             Client.getRaw(
               buildMkdirUrl(this.currentPath(),newFolderName),
               this.reloadFilesFromServer
             );
     },
-
+    onClick:function(f){
+        console.log("onClick");
+        console.log(f);
+        if (f.isdir){
+          this.updatePath(f.path);
+        }
+        else{
+           this.getContent(f.path);
+        }
+    },
+    mapfunc:function(f, idx){
+      var id  =  File.id(f.name);
+      return (<File key={idx}  id={id} gridView={this.state.gridView} onClick={()=>this.onClick(f)} 
+      path={f.path} name={f.name} isdir={f.isdir} size={f.size} time={f.time} browser={this}
+      />)
+    },
     render: function() {
-            var files = this.state.files.map(function(f) {
-                    var id  =  File.id(f.name);
-                    var onClick = f.isdir ? function(event){
-                            this.updatePath(f.path);
-                    }.bind(this) :
-                            function(event) {
-                                    this.getContent(f.path);
-                            }.bind(this)
-                            return (<File key={id} id={id} gridView={this.state.gridView} onClick={onClick} path={f.path} name={f.name} isdir={f.isdir} size={f.size} time={f.time} browser={this}/>)
-            }.bind(this));
+            // var files = this.state.files.map(function(f) {
+            //         var id  =  File.id(f.name);
+            //         var onClick = f.isdir ? function(event){
+            //                 this.updatePath(f.path);
+            //         }.bind(this) :
+            //                 function(event) {
+            //                         this.getContent(f.path);
+            //                 }.bind(this)
+            //                 return (<File id={id} gridView={this.state.gridView} onClick={onClick} path={f.path} name={f.name} isdir={f.isdir} size={f.size} time={f.time} browser={this}/>)
+            // }.bind(this));
+
+    const files = this.state.files.map(this.mapfunc);
 
             var gridGlyph = "glyphicon glyphicon-th-large";
             var listGlyph = "glyphicon glyphicon-list";
             var className = this.state.gridView ? listGlyph : gridGlyph;
-            var layout = null;
             var  contextMenu = (<div id="context-menu">
                             <ul className="dropdown-menu" role="menu">
                             <li><a tabIndex="-1">Rename</a></li>
@@ -422,8 +330,8 @@ var Browser = createReactClass({
                             </ul>
                             </div>);
 
-            layout = null; 
-            var toolbar=(<div><nav className="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            var toolbar=(<div>
+            <nav className="navbar navbar-inverse ">
                         <div className="navbar-header">
                                 <button type="button" className="navbar-toggle" data-toggle="collapse" data-target="#example-navbar-collapse">
                                         <span className="sr-only">Toggle navigation</span>
@@ -436,37 +344,24 @@ var Browser = createReactClass({
                                 <ul className="nav navbar-nav">
                                         <li id="backButton"><a onClick={this.onBack}><span className="glyphicon glyphicon-arrow-left"/></a></li>
                                         <li id="parentButton"><a onClick={this.onParent} ><span className="glyphicon glyphicon-arrow-up"/></a></li>
-                                        <li id="forwardButton"><a ><span className="glyphicon glyphicon-arrow-right"/></a></li>
                                         <li id="uploadButton"><a onClick={this.onUpload} ><span className="glyphicon glyphicon-upload"/></a></li>
                                         <li id="mkdirButton"><a onClick={this.mkdir} ><span className="glyphicon glyphicon-folder-open"/></a></li>
                                         <li id="alternateViewButton"><a onClick={this.alternateView}>
                                        <span ref="altViewSpan" className={className} />
                                         </a></li>
-                                        <li><a id="pathSpan"><span className="glyphicon glyphicon-chevron-right"/></a></li>
+                                        <li><a id="pathSpan"><span className="glyphicon glyphicon-chevron-right"/>{this.state.current_path}</a></li>
                                 </ul>
-
-                                <div id="login-form" className="navbar-form navbar-right">
-                                        <div  className="form-group">
-                                                <input placeholder="Email" id="login-user-input" className="form-control" type="text" />
-                                        </div>
-                                                <div className="form-group">
-                                                        <input placeholder="Password" id="login-password-input" className="form-control" type="password" />
-                                                </div>
-                                                <button id="loginButton" className="btn btn-success" >Sign in</button>
-                                </div>
                         </div>
                 </nav>
-
-    <h1>&nbsp;</h1>
-    <input type="file" id="uploadInput" style={{display:"none"}} /></div>);
+    <input type="file" id="uploadInput" onChange={this.uploadFile()} style={{display:this.state.displayUpload}} /></div>);
             if (this.state.gridView)
-            { 
+            {
                     return (<div>{toolbar}
                                     {files}
                                     {contextMenu}
                                     </div>)
 
-                            
+
             }
             else{
               var sortGlyph = "glyphicon glyphicon-sort";
@@ -483,7 +378,7 @@ var Browser = createReactClass({
                               </tbody>
                               </table>
                               {contextMenu}
-                              
+
                 </div>)
             }
     }
@@ -491,5 +386,5 @@ var Browser = createReactClass({
 
 ReactDOM.render(
                 <Browser/>,
-                document.getElementById('content')
+                document.getElementById('root')
             );
