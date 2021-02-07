@@ -1,8 +1,35 @@
-<html>
+<!doctype html>
+<html lang="zh-Hans">
   <head>
-    <title>Getting Started</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#000000">
+    <!--
+      manifest.json provides metadata used when your web app is added to the
+      homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
+    -->
+<style type="text/css">
+    input {
+      border: 1px solid #000;
+    }
+    td{ 
+      padding: 3px 3px 3px 3px; 
+    }
+    #page{ 
+      padding: 5px 5px 5px 5px;
+    }
+    thead tr{ font-weight:bold;}
+    .table_input{background-color:green;}
+    .newClass { background-color:#8888ff;}
+    .custom-modal{width:800px;}
+  </style>
+    <title>React装箱单</title>
   </head>
   <body>
-    <script src="bundle.js"></script>
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <div id="root"></div>
+<script type="text/javascript" src="./dist/main.js"></script>
   </body>
 </html>
