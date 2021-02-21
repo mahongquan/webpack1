@@ -4,19 +4,18 @@
   "private": true,
   "proxy": "http://localhost:8000/",
   "dependencies": {
-    "classnames": "^2.2.6",
+    "classnames": "latest",
     "esbuild-loader": "latest",
-    "prop-types": "^15.7.2",
-    "query-string": "^6.14.0",
-    "react": "16.14.0",
-    "react-bootstrap": "^1.5.0",
-    "react-dom": "16.14.0",
-    "react-redux": "^7.2.2",
-    "redux": "^4.0.5",
-    "redux-thunk": "^2.3.0",
-    "source-map-loader": "^2.0.1",
+    "prop-types": "latest",
+    "query-string": "latest",
+    "react": "latest",
+    "react-bootstrap": "latest",
+    "react-dom": "latest",
+    "react-redux": "latest",
+    "redux": "latest",
+    "redux-thunk": "latest",
     "webpack": "latest",
-    "webpack-dev-server": "^3.11.2"
+    "webpack-dev-server": "latest"
   },
   "devDependencies": {
     "webpack-cli": "latest"
