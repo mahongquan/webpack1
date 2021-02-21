@@ -1,0 +1,6 @@
+export const ADD_TODO_RES = 'ADD_TODO_RES';
+export const LOAD_TODO_RES = 'LOAD_TODO_RES';
+export const DELETE_TODO_RES = 'DELETE_TODO_RES';
+export const EDIT_TODO_RES = 'EDIT_TODO_RES';
+export const COMPLETE_TODO_RES = 'COMPLETE_TODO_RES';
+export const CLEAR_COMPLETED_RES = 'CLEAR_COMPLETED_RES';

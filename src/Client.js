@@ -47,6 +47,18 @@ function post(url,data,cb) {
     .then(parseJSON)
     .then(cb);
 }
+function put(url,data,cb) {
+  var method="PUT"
+  return fetch(url,
+  {
+      method: method,
+      credentials: 'include',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+  }).then(checkStatus)
+    .then(parseJSON)
+    .then(cb);
+}
 function postOrPut(url,data,cb) {
   var method="POST"
   if (data.id){
@@ -157,5 +169,5 @@ function parseJSON(response) {
   return r;
 }
 
-const Client = {getRaw,contacts,items,login_index,login,logout,UsePacks,PackItems,get,post,postOrPut,delete1,postForm};
+const Client = {put,getRaw,contacts,items,login_index,login,logout,UsePacks,PackItems,get,post,postOrPut,delete1,postForm};
 export default Client;
