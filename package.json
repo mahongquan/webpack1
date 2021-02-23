@@ -4,7 +4,9 @@
   "private": true,
   "proxy": "http://localhost:8000/",
   "dependencies": {
+    "bootstrap": "^4.6.0",
     "classnames": "latest",
+    "css-loader": "^5.0.2",
     "esbuild-loader": "latest",
     "prop-types": "latest",
     "query-string": "latest",
@@ -14,6 +16,7 @@
     "react-redux": "latest",
     "redux": "latest",
     "redux-thunk": "latest",
+    "style-loader": "^2.0.0",
     "webpack": "latest",
     "webpack-dev-server": "latest"
   },

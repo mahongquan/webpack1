@@ -1,2 +1,2 @@
 rem node_modules\.bin\webpack src/index.js dist/bundle.js
-node_modules\.bin\webpack
+node_modules\.bin\webpack serve
