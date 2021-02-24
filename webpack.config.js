@@ -16,10 +16,6 @@ module.exports = {
            target: 'es2015' // Syntax to compile to (see options below for possible values)
          }
        },
-       {
-                    test: /\.css$/,
-                    use: ["style-loader","css-loader"]
-                }
       ],
     },
     plugins: [
