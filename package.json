@@ -30,5 +30,8 @@
   "devDependencies": {
     "webpack-cli": "latest"
   },
-  "scripts": {}
+  "scripts": {
+    "e":"esbuild --bundle --watch src/index.js --outfile=main.js --loader:.js=jsx",
+    "h":"esbuild --help"
+  }
 }
