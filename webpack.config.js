@@ -1,5 +1,4 @@
 const path = require('path');
-const { ESBuildPlugin } = require('esbuild-loader')
 module.exports = {
     entry: './src/index.js',
     output: {
@@ -10,17 +9,11 @@ module.exports = {
       rules: [
        {
          test: /\.js$/,
-         loader: 'esbuild-loader',
-         options: {
-           loader: 'jsx', // Remove this if you're not using JSX
-           target: 'es2015' // Syntax to compile to (see options below for possible values)
-         }
+         loader: 'swc-loader',
+         exclude: /(node_modules|bower_components)/,
        },
       ],
     },
-    plugins: [
-     new ESBuildPlugin()
-    ],
   devServer: {
     proxy: {
       '/rest': 'http://localhost:8000/',
